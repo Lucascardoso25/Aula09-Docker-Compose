@@ -1,0 +1,41 @@
+name: CI Pipeline com Docker Compose
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build e Push com Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build com Docker Compose
+        run: docker compose build
+
+      - name: Push com Docker Compose
+        run: docker compose push
+
+  test:
+    name: Teste de Rede e Integração
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Subir Ambiente de Teste
+        run: docker compose up -d
+
+      - name: Validar Comunicação (Ping)
+        run: docker compose exec -T servico-vizinho ping -c 4 calculadora-app
