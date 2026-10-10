@@ -1,7 +1,7 @@
 services:
   calculadora-app:
     build: .
-    image: luk4ku/pipeline-ci:latest
+    image: luk4ku/aula09-docker-compose:latest
     tty: true
 
   servico-vizinho:
