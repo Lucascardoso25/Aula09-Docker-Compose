@@ -1,9 +1,0 @@
-services:
-  calculadora-app:
-    build: .
-    image: ${{ secrets.DOCKER_USER }}/pipeline-ci:latest
-    tty: true
-
-  servico-vizinho:
-    image: alpine
-    command: sleep infinity
