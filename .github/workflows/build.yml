@@ -1,14 +1,15 @@
-name: CI Pipeline com Docker Compose
+name: CI Pipeline - Aula 09 Docker Compose
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build e Push com Docker Compose
+  cenario1-build-test:
+    name: Cenário 1 - Build e Teste Ping
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Código
@@ -20,22 +21,34 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      - name: Build com Docker Compose
-        run: docker compose build
+      - name: Build do Cenário 1
+        run: |
+          cd cenario1
+          docker compose build
 
-      - name: Push com Docker Compose
-        run: docker compose push
+      - name: Subir Ambiente do Cenário 1
+        run: |
+          cd cenario1
+          docker compose up -d
 
-  test:
-    name: Teste de Rede e Integração
-    needs: build
+      - name: Validar Conectividade Ping
+        run: |
+          cd cenario1
+          docker compose exec -T servico-vizinho ping -c 4 calculadora-app
+
+  cenario2-test:
+    name: Cenário 2 - Validar WordPress e MariaDB
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Subir Ambiente de Teste
-        run: docker compose up -d
+      - name: Subir Ambiente WordPress
+        run: |
+          cd cenario2
+          docker compose up -d
 
-      - name: Validar Comunicação (Ping)
-        run: docker compose exec -T servico-vizinho ping -c 4 calculadora-app
+      - name: Validar Containers Ativos
+        run: |
+          cd cenario2
+          docker compose ps
